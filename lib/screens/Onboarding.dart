@@ -4,7 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../utils/MySharedPreferences.dart';
 
 class Onboarding extends StatelessWidget {
-  PageController _controller = PageController();
+  final PageController _controller = PageController();
 
   Onboarding({super.key});
 
@@ -14,47 +14,47 @@ class Onboarding extends StatelessWidget {
     const tail =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
     return Scaffold(
-        body: Stack(
-          children: [
-            PageView(
-              controller: _controller,
-              children: const [
-                Page1(
-                  "Earn for every Referal",
-                  "assets/placeholders/1.png",
-                  tail,
-                ),
-                Page1(
-                  "Send Money Fast",
-                  "assets/placeholders/1.png",
-                  tail,
-                ),
-                Page1(
-                  "Over 50 Countries",
-                  "assets/placeholders/1.png",
-                  tail,
-                ),
-                FinalPage("Final page", "assets/placeholders/1.png"),
-              ],
-            ),
-            SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Spacer(),
-                    SmoothPageIndicator(
-                      controller: _controller,
-                      count: 4,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          PageView(
+            controller: _controller,
+            children: const [
+              Page1(
+                "Earn for every Referal",
+                "assets/placeholders/1.png",
+                tail,
+              ),
+              Page1(
+                "Send Money Fast",
+                "assets/placeholders/1.png",
+                tail,
+              ),
+              Page1(
+                "Over 50 Countries",
+                "assets/placeholders/1.png",
+                tail,
+              ),
+              FinalPage("Final page", "assets/placeholders/1.png"),
+            ],
+          ),
+          SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Spacer(),
+                  SmoothPageIndicator(
+                    controller: _controller,
+                    count: 4,
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -72,25 +72,23 @@ class Page1 extends StatelessWidget {
       color: theme.colorScheme.onBackground,
     );
 
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                heading,
-                style: style,
-              ),
-              const SizedBox(height: 60.0),
-              Image.asset(image),
-              const SizedBox(
-                height: 60,
-              ),
-              Text(tail)
-            ],
-          ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              heading,
+              style: style,
+            ),
+            const SizedBox(height: 60.0),
+            Image.asset(image),
+            const SizedBox(
+              height: 60,
+            ),
+            Text(tail)
+          ],
         ),
       ),
     );

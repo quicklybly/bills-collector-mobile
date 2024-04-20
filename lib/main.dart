@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   static final _defaultLightColorScheme =
-  ColorScheme.fromSwatch(primarySwatch: Colors.blue);
+      ColorScheme.fromSwatch(primarySwatch: Colors.blue);
 
   static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
       primarySwatch: Colors.blue, brightness: Brightness.dark);
@@ -29,32 +29,30 @@ class _MyAppState extends State<MyApp> {
     MySharedPreferences.instance
         .getBooleanValue("notFirstRun")
         .then((value) => setState(() {
-      isFirstLaunch = false;
-    }));
+              isFirstLaunch = false;
+            }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-        builder: (lightColorScheme, darkColorScheme) {
-          return ChangeNotifierProvider(
-            create: (context) => Bills(),
-            child: MaterialApp(
-              title: 'Bills Collector',
-              theme: ThemeData(
-                colorScheme: lightColorScheme ?? MyApp._defaultLightColorScheme,
-                useMaterial3: true,
-              ),
-              darkTheme: ThemeData(
-                colorScheme: darkColorScheme ?? MyApp._defaultDarkColorScheme,
-                useMaterial3: true,
-              ),
-              themeMode: ThemeMode.system,
-              home: isFirstLaunch ? MyHomePage() : Onboarding(),
-            ),
-          );
-        }
-    );
+    return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
+      return ChangeNotifierProvider(
+        create: (context) => Bills(),
+        child: MaterialApp(
+          title: 'Bills Collector',
+          theme: ThemeData(
+            colorScheme: lightColorScheme,
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkColorScheme,
+            useMaterial3: true,
+          ),
+          themeMode: ThemeMode.system,
+          home: isFirstLaunch ? MyHomePage() : Onboarding(),
+        ),
+      );
+    });
   }
 }
 
@@ -66,62 +64,75 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return Builder(
+      builder: (context) {
+        return Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                ElevatedButton(onPressed: () {}, child: Text("Test")),
+                Text("iosdjdajksskjldakjsldjklasljkdakljsdjkl")
+              ],
+            ),
+          ),
+        );
+      }
+    );
   }
 
-  // var selectedIndex = 0;
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //
-  //   Widget page;
-  //   switch (selectedIndex) {
-  //     case 0:
-  //       page = GeneratorPage();
-  //       break;
-  //     case 1:
-  //       page = FavoritesPage();
-  //       break;
-  //     default:
-  //       throw UnimplementedError('no widget for $selectedIndex');
-  //   }
-  //
-  //   return LayoutBuilder(
-  //       builder: (context, constraints) {
-  //         return Scaffold(
-  //           body: Row(
-  //             children: [
-  //               SafeArea(
-  //                 child: NavigationRail(
-  //                   extended: constraints.maxWidth >= 600,
-  //                   destinations: [
-  //                     NavigationRailDestination(
-  //                       icon: Icon(Icons.home),
-  //                       label: Text('Home'),
-  //                     ),
-  //                     NavigationRailDestination(
-  //                       icon: Icon(Icons.favorite),
-  //                       label: Text('Favorites'),
-  //                     ),
-  //                   ],
-  //                   selectedIndex: selectedIndex,
-  //                   onDestinationSelected: (value) {
-  //                     setState(() {
-  //                       selectedIndex = value;
-  //                     });
-  //                   },
-  //                 ),
-  //               ),
-  //               Expanded(
-  //                 child: Container(
-  //                   color: Theme.of(context).colorScheme.primaryContainer,
-  //                   child: page,
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       }
-  //   );
-  // }
+// var selectedIndex = 0;
+//
+// @override
+// Widget build(BuildContext context) {
+//
+//   Widget page;
+//   switch (selectedIndex) {
+//     case 0:
+//       page = GeneratorPage();
+//       break;
+//     case 1:
+//       page = FavoritesPage();
+//       break;
+//     default:
+//       throw UnimplementedError('no widget for $selectedIndex');
+//   }
+//
+//   return LayoutBuilder(
+//       builder: (context, constraints) {
+//         return Scaffold(
+//           body: Row(
+//             children: [
+//               SafeArea(
+//                 child: NavigationRail(
+//                   extended: constraints.maxWidth >= 600,
+//                   destinations: [
+//                     NavigationRailDestination(
+//                       icon: Icon(Icons.home),
+//                       label: Text('Home'),
+//                     ),
+//                     NavigationRailDestination(
+//                       icon: Icon(Icons.favorite),
+//                       label: Text('Favorites'),
+//                     ),
+//                   ],
+//                   selectedIndex: selectedIndex,
+//                   onDestinationSelected: (value) {
+//                     setState(() {
+//                       selectedIndex = value;
+//                     });
+//                   },
+//                 ),
+//               ),
+//               Expanded(
+//                 child: Container(
+//                   color: Theme.of(context).colorScheme.primaryContainer,
+//                   child: page,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         );
+//       }
+//   );
+// }
 }
