@@ -1,4 +1,4 @@
-import 'package:bills_collector_mobile/model/Bills.dart';
+import 'package:bills_collector_mobile/screens/MyHomePage.dart';
 import 'package:bills_collector_mobile/screens/Onboarding.dart';
 import 'package:bills_collector_mobile/utils/MySharedPreferences.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -14,13 +14,13 @@ CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final isFirstLaunch = await MySharedPreferences.instance.getBooleanValue("notFirstRun");
-  runApp(MyApp(isFirstLaunch: isFirstLaunch));
+  final notFirstRun = await MySharedPreferences.instance.getBooleanValue("notFirstRun");
+  runApp(MyApp(notFirstRun: notFirstRun));
 }
 
 class MyApp extends StatefulWidget {
-  final bool isFirstLaunch;
-  const MyApp({super.key, required this.isFirstLaunch});
+  final bool notFirstRun;
+  const MyApp({super.key, required this.notFirstRun});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
             extensions: [darkCustomColors],
           ),
           themeMode: ThemeMode.system,
-          home: Onboarding(),
+          home: widget.notFirstRun ? MyHomePage() : Onboarding(),
           debugShowCheckedModeBanner: false,
         );
       },
@@ -101,85 +101,4 @@ class CustomColors extends ThemeExtension<CustomColors> {
   CustomColors harmonized(ColorScheme dynamic) {
     return copyWith(danger: danger!.harmonizeWith(dynamic.primary));
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return Scaffold(
-          body: SafeArea(
-            child: Column(
-              children: [
-                ElevatedButton(onPressed: () {}, child: Text("Test")),
-                Text("iosdjdajksskjldakjsldjklasljkdakljsdjkl")
-              ],
-            ),
-          ),
-        );
-      }
-    );
-  }
-
-// var selectedIndex = 0;
-//
-// @override
-// Widget build(BuildContext context) {
-//
-//   Widget page;
-//   switch (selectedIndex) {
-//     case 0:
-//       page = GeneratorPage();
-//       break;
-//     case 1:
-//       page = FavoritesPage();
-//       break;
-//     default:
-//       throw UnimplementedError('no widget for $selectedIndex');
-//   }
-//
-//   return LayoutBuilder(
-//       builder: (context, constraints) {
-//         return Scaffold(
-//           body: Row(
-//             children: [
-//               SafeArea(
-//                 child: NavigationRail(
-//                   extended: constraints.maxWidth >= 600,
-//                   destinations: [
-//                     NavigationRailDestination(
-//                       icon: Icon(Icons.home),
-//                       label: Text('Home'),
-//                     ),
-//                     NavigationRailDestination(
-//                       icon: Icon(Icons.favorite),
-//                       label: Text('Favorites'),
-//                     ),
-//                   ],
-//                   selectedIndex: selectedIndex,
-//                   onDestinationSelected: (value) {
-//                     setState(() {
-//                       selectedIndex = value;
-//                     });
-//                   },
-//                 ),
-//               ),
-//               Expanded(
-//                 child: Container(
-//                   color: Theme.of(context).colorScheme.primaryContainer,
-//                   child: page,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       }
-//   );
-// }
 }
