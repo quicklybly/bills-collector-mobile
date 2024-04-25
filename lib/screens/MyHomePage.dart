@@ -1,5 +1,21 @@
+import 'package:bills_collector_mobile/model/bill.dart';
+import 'package:bills_collector_mobile/model/bills.dart';
+import 'package:bills_collector_mobile/model/payment.dart';
+import 'package:bills_collector_mobile/screens/DetailPage.dart';
 import 'package:bills_collector_mobile/screens/Onboarding.dart';
+import 'package:bills_collector_mobile/utils/IconPicker.dart';
 import 'package:flutter/material.dart';
+
+final _test_data = Bills([
+  Bill(1, "Электричество", "comment", [
+    Payment(1, 100, DateTime(2024, 1, 1)),
+    Payment(2, 150, DateTime(2024, 2, 1))
+  ]),
+  Bill(2, "Газ", "comment2", [
+    Payment(3, 50, DateTime(2024, 3, 1)),
+    Payment(4, 25, DateTime(2024, 4, 5))
+  ])
+]);
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -12,8 +28,13 @@ class _MyHomePageState extends State<MyHomePage> {
     final theme = Theme.of(context);
     double scrolledUnderElevation = 4.0;
 
+    print(theme.colorScheme.surface);
+    print(theme.colorScheme.surfaceContainer);
+    print(theme.colorScheme.surfaceContainerHighest);
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: theme.colorScheme.surfaceContainer,
         scrolledUnderElevation: scrolledUnderElevation,
         actions: [
           IconButton(
@@ -34,22 +55,64 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 icon: Icon(
                   Icons.menu,
-                  color: theme.colorScheme.onPrimary,
+                  color: theme.colorScheme.onSurface,
                 ));
           },
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            ElevatedButton(onPressed: () {}, child: Text("Test")),
-            Container(
-              color: theme.colorScheme.surfaceContainer,
-              child: Text("123"),
-            ),
-            Text("iosdjdajksskjldakjsldjklasljkdakljsdjkl")
-          ],
+      body: GridView.builder(
+        itemCount: _test_data.bills.length,
+        padding: const EdgeInsets.all(8.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 2.0,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
         ),
+        itemBuilder: (BuildContext context, int index) {
+          final item = _test_data.bills[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailPage(bill: item)));
+            },
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                color: theme.colorScheme.primaryContainer,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(
+                          IconPicker().pick(item.type),
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                        child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.type,
+                        style: theme.textTheme.titleSmall!.copyWith(
+                            color: theme.colorScheme.onPrimaryContainer),
+                      ),
+                    ))
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

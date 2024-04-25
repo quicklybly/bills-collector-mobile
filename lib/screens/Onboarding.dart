@@ -1,7 +1,6 @@
 import 'package:bills_collector_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:material_color_utilities/material_color_utilities.dart';
 
 import '../utils/MySharedPreferences.dart';
 import 'MyHomePage.dart';

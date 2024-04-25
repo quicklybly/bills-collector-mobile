@@ -37,10 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.3
   provider: ^6.0.0
-  dynamic_color: ^1.4.0
+  dynamic_color: ^1.7.0
   smooth_page_indicator: ^1.1.0
   json_annotation: ^4.8.1
-  material_color_utilities: ^0.8.0
 
 dev_dependencies:
   flutter_test:
