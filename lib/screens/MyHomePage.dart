@@ -1,9 +1,12 @@
 import 'package:bills_collector_mobile/model/bill.dart';
 import 'package:bills_collector_mobile/model/bills.dart';
 import 'package:bills_collector_mobile/model/payment.dart';
+import 'package:bills_collector_mobile/screens/About.dart';
 import 'package:bills_collector_mobile/screens/AddNewBill.dart';
 import 'package:bills_collector_mobile/screens/DetailPage.dart';
 import 'package:bills_collector_mobile/screens/Onboarding.dart';
+import 'package:bills_collector_mobile/screens/final_page_with_login.dart';
+import 'package:bills_collector_mobile/screens/registration_screen.dart';
 import 'package:bills_collector_mobile/utils/IconPicker.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +21,22 @@ final _test_data = Bills([
   ])
 ]);
 
+class DrawerPoints {
+  const DrawerPoints(this.label, this.icon, this.selectedIcon, this.screen);
+
+  final String label;
+  final Widget icon;
+  final Widget selectedIcon;
+  final Widget screen;
+}
+
+const List<DrawerPoints> destinations = <DrawerPoints>[
+  DrawerPoints('Регистрация', Icon(Icons.account_circle_outlined),
+      Icon(Icons.account_circle), RegistrationScreen()),
+  DrawerPoints(
+      'Логин', Icon(Icons.manage_accounts_outlined), Icon(Icons.manage_accounts), FinalPage()),
+];
+
 class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -28,6 +47,30 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     double scrolledUnderElevation = 4.0;
+    int screenIndex = -1;
+    final List<Widget> aboutBoxChildren = <Widget>[
+      const SizedBox(height: 24),
+      RichText(
+        text: TextSpan(
+          children: <TextSpan>[
+            TextSpan(
+                style: theme.textTheme.bodyMedium,
+                text: "Благодарим вас за выбор BillsCollector! Наше мобильное приложение поможет вам следить за своими счетами. На информационной странице представлен краткий обзор функций, включая отслеживание счетов, напоминания и аналитику. Контролируйте свои финансы с помощью Bill-Collector.\nGitHub: "),
+            TextSpan(
+                style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.primary),
+                text: 'https://flutter.dev'),
+            TextSpan(style: theme.textTheme.bodyMedium, text: '.'),
+          ],
+        ),
+      ),
+    ];
+
+    void handleScreenChanged(int selectedScreen) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => destinations[selectedScreen].screen));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -39,10 +82,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => Onboarding()));
               },
-              icon: Icon(Icons.adb))
+              icon: const Icon(Icons.adb))
         ],
-        title: const Text(
+        title: Text(
           "Bills Collector",
+          style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onSurface),
         ),
         leading: Builder(
           builder: (BuildContext context) {
@@ -56,6 +100,45 @@ class _MyHomePageState extends State<MyHomePage> {
                 ));
           },
         ),
+      ),
+      // todo вынести в отдельный файл
+      drawer: NavigationDrawer(
+        selectedIndex: screenIndex,
+        onDestinationSelected: handleScreenChanged,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
+            child: Text(
+              'Bills Collector',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(color: theme.colorScheme.onSurface),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(28, 16, 28, 10),
+            child: Divider(),
+          ),
+          ...destinations.map(
+            (DrawerPoints destination) {
+              return NavigationDrawerDestination(
+                label: Text(destination.label),
+                icon: destination.icon,
+                selectedIcon: destination.selectedIcon,
+              );
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(28, 16, 28, 10),
+            child: Divider(),
+          ),
+          AboutListTile(
+            icon: const Icon(Icons.info_outline),
+            applicationName: 'Bills Collector',
+            applicationVersion: '0.1',
+            applicationLegalese: '\u{a9} Bills Collector Team',
+            applicationIcon: Image.asset('assets/icon_64.png'),
+            aboutBoxChildren: aboutBoxChildren,
+          )
+        ],
       ),
       body: Container(
         color: theme.colorScheme.surface,
@@ -125,60 +208,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-// var selectedIndex = 0;
-//
-// @override
-// Widget build(BuildContext context) {
-//
-//   Widget page;
-//   switch (selectedIndex) {
-//     case 0:
-//       page = GeneratorPage();
-//       break;
-//     case 1:
-//       page = FavoritesPage();
-//       break;
-//     default:
-//       throw UnimplementedError('no widget for $selectedIndex');
-//   }
-//
-//   return LayoutBuilder(
-//       builder: (context, constraints) {
-//         return Scaffold(
-//           body: Row(
-//             children: [
-//               SafeArea(
-//                 child: NavigationRail(
-//                   extended: constraints.maxWidth >= 600,
-//                   destinations: [
-//                     NavigationRailDestination(
-//                       icon: Icon(Icons.home),
-//                       label: Text('Home'),
-//                     ),
-//                     NavigationRailDestination(
-//                       icon: Icon(Icons.favorite),
-//                       label: Text('Favorites'),
-//                     ),
-//                   ],
-//                   selectedIndex: selectedIndex,
-//                   onDestinationSelected: (value) {
-//                     setState(() {
-//                       selectedIndex = value;
-//                     });
-//                   },
-//                 ),
-//               ),
-//               Expanded(
-//                 child: Container(
-//                   color: Theme.of(context).colorScheme.primaryContainer,
-//                   child: page,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       }
-//   );
-// }
 }

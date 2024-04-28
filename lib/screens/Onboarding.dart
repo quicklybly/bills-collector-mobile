@@ -38,7 +38,7 @@ class Onboarding extends StatelessWidget {
                   "assets/onboarding/Layer 0.png",
                   "Планирование - это все. Мы поможем вам оставаться сосредоточенными на отслеживании ваших расходов и достижении ваших финансовых целей.",
                 ),
-                FinalPage(heading: "Авторизация"),
+                FinalPage(),
               ],
             ),
             SafeArea(
