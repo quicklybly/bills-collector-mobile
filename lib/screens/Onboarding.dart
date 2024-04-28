@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../utils/MySharedPreferences.dart';
+import 'final_page_with_login.dart';
 import 'MyHomePage.dart';
 
 class Onboarding extends StatelessWidget {
@@ -13,31 +14,31 @@ class Onboarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const tail =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
     return Builder(builder: (context) {
       return Scaffold(
+        resizeToAvoidBottomInset : false,
         body: Stack(
           children: [
             PageView(
               controller: _controller,
               children: const [
-                Page1(
-                  "Earn for every Referal",
-                  "assets/placeholders/1.png",
-                  tail,
+                OnboardingPage(
+                  "Добро пожаловать",
+                  "assets/onboarding/qfqfqfqfq 1.png",
+                  "Поздоровайтесь с вашим новым сборщиком финансов, это ваш первый шаг к более эффективному контролю над вашими деньгами и финансовыми целями.",
                 ),
-                Page1(
-                  "Send Money Fast",
-                  "assets/placeholders/1.png",
-                  tail,
+                OnboardingPage(
+                  "Контролируйте свои расходы и начинайте копить",
+                  "assets/onboarding/digital-strategy 2.png",
+                  "Bills Collector помогает вам контролировать ваши расходы, отслеживать ваши расходы и в конечном итоге сэкономить больше денег.",
                 ),
-                Page1(
-                  "Over 50 Countries",
-                  "assets/placeholders/1.png",
-                  tail,
+                OnboardingPage(
+                  "Вместе мы достигнем ваших финансовых целей",
+                  "assets/onboarding/Layer 0.png",
+                  "Планирование - это все. Мы поможем вам оставаться сосредоточенными на отслеживании ваших расходов и достижении ваших финансовых целей.",
                 ),
-                FinalPage("Final page", "assets/placeholders/1.png"),
+                FinalPage(heading: "Авторизация"),
               ],
             ),
             SafeArea(
@@ -50,7 +51,7 @@ class Onboarding extends StatelessWidget {
                       controller: _controller,
                       count: 4,
                       effect: SlideEffect(
-                        dotColor: theme.colorScheme.onPrimary,
+                        dotColor: theme.colorScheme.surfaceContainer,
                         activeDotColor: theme.colorScheme.primary,
                       ),
                     ),
@@ -66,8 +67,8 @@ class Onboarding extends StatelessWidget {
   }
 }
 
-class Page1 extends StatelessWidget {
-  const Page1(this.heading, this.image, this.tail, {super.key});
+class OnboardingPage extends StatelessWidget {
+  const OnboardingPage(this.heading, this.image, this.tail, {super.key});
 
   final String heading;
   final String image;
@@ -80,7 +81,7 @@ class Page1 extends StatelessWidget {
     return Builder(
       builder: (context) {
         return Container(
-          color: theme.colorScheme.surfaceContainer,
+          color: theme.colorScheme.surface,
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -89,9 +90,10 @@ class Page1 extends StatelessWidget {
                 children: [
                   Text(
                     heading,
-                    style: theme.textTheme.displaySmall!.copyWith(
+                    style: theme.textTheme.titleLarge!.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 60.0),
                   Image.asset(image),
@@ -103,6 +105,7 @@ class Page1 extends StatelessWidget {
                     style: theme.textTheme.bodyLarge!.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
+                    textAlign: TextAlign.center,
                   )
                 ],
               ),
@@ -114,68 +117,4 @@ class Page1 extends StatelessWidget {
   }
 }
 
-class FinalPage extends StatefulWidget {
-  const FinalPage(this.heading, this.image, {super.key});
 
-  final String heading;
-  final String image;
-
-  @override
-  State<FinalPage> createState() => _FinalPageState();
-}
-
-class _FinalPageState extends State<FinalPage> {
-  _FinalPageState() {
-    MySharedPreferences.instance.setBooleanValue("notFirstRun", true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      color: theme.colorScheme.surface,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              widget.heading,
-              style: theme.textTheme.displaySmall!.copyWith(
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 60.0),
-            Image.asset(widget.image),
-            const SizedBox(
-              height: 30,
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text(
-                "Войти",
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text(
-                "Зарегистрироваться",
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => MyHomePage()));
-              },
-              child: const Text(
-                "Продолжить без авторизации",
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

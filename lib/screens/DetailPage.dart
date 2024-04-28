@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../model/bill.dart';
 
@@ -11,6 +11,4 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Placeholder();
   }
-
-
 }

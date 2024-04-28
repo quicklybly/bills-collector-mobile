@@ -1,6 +1,7 @@
 import 'package:bills_collector_mobile/model/bill.dart';
 import 'package:bills_collector_mobile/model/bills.dart';
 import 'package:bills_collector_mobile/model/payment.dart';
+import 'package:bills_collector_mobile/screens/AddNewBill.dart';
 import 'package:bills_collector_mobile/screens/DetailPage.dart';
 import 'package:bills_collector_mobile/screens/Onboarding.dart';
 import 'package:bills_collector_mobile/utils/IconPicker.dart';
@@ -27,10 +28,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     double scrolledUnderElevation = 4.0;
-
-    print(theme.colorScheme.surface);
-    print(theme.colorScheme.surfaceContainer);
-    print(theme.colorScheme.surfaceContainerHighest);
 
     return Scaffold(
       appBar: AppBar(
@@ -60,59 +57,71 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ),
-      body: GridView.builder(
-        itemCount: _test_data.bills.length,
-        padding: const EdgeInsets.all(8.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 2.0,
-          mainAxisSpacing: 10.0,
-          crossAxisSpacing: 10.0,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          final item = _test_data.bills[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DetailPage(bill: item)));
-            },
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-                color: theme.colorScheme.primaryContainer,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Icon(
-                          IconPicker().pick(item.type),
-                          color: theme.colorScheme.onPrimaryContainer,
+      body: Container(
+        color: theme.colorScheme.surface,
+        child: GridView.builder(
+          itemCount: _test_data.bills.length,
+          padding: const EdgeInsets.all(8.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 2.0,
+            mainAxisSpacing: 10.0,
+            crossAxisSpacing: 10.0,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            final item = _test_data.bills[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailPage(bill: item)));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  color: theme.colorScheme.primaryContainer,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Icon(
+                            IconPicker().pick(item.type),
+                            color: theme.colorScheme.onPrimaryContainer,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                        child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        item.type,
-                        style: theme.textTheme.titleSmall!.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer),
-                      ),
-                    ))
-                  ],
+                      Expanded(
+                          child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          item.type,
+                          style: theme.textTheme.titleSmall!.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer),
+                        ),
+                      ))
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddNewBill(bills: _test_data)));
         },
+        child: const Icon(Icons.add),
       ),
     );
   }
