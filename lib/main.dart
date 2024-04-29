@@ -1,9 +1,13 @@
-import 'package:bills_collector_mobile/screens/MyHomePage.dart';
-import 'package:bills_collector_mobile/screens/Onboarding.dart';
+import 'package:bills_collector_mobile/model/bills.dart';
+import 'package:bills_collector_mobile/screens/home_page.dart';
+import 'package:bills_collector_mobile/screens/onboarding.dart';
 import 'package:bills_collector_mobile/utils/MySharedPreferences.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'model/bill.dart';
+import 'model/payment.dart';
 
 bool _isDemoUsingDynamicColors = false;
 
@@ -14,12 +18,14 @@ CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final notFirstRun = await MySharedPreferences.instance.getBooleanValue("notFirstRun");
+  final notFirstRun =
+      await MySharedPreferences.instance.getBooleanValue("notFirstRun");
   runApp(MyApp(notFirstRun: notFirstRun));
 }
 
 class MyApp extends StatefulWidget {
   final bool notFirstRun;
+
   const MyApp({super.key, required this.notFirstRun});
 
   @override
@@ -65,7 +71,19 @@ class _MyAppState extends State<MyApp> {
             extensions: [darkCustomColors],
           ),
           themeMode: ThemeMode.system,
-          home: widget.notFirstRun ? MyHomePage() : Onboarding(),
+          home: ChangeNotifierProvider(
+                  create: (context) => Bills([
+                        Bill(1, "Электричество", "comment", [
+                          Payment(1, 100, DateTime(2024, 1, 1)),
+                          Payment(2, 150, DateTime(2024, 2, 1)),
+                          Payment(5, 125, DateTime(2024, 3, 1)),
+                        ]),
+                        Bill(2, "Газ", "comment2", [
+                          Payment(3, 50, DateTime(2024, 3, 1)),
+                          Payment(4, 25, DateTime(2024, 4, 5))
+                        ])
+                      ]),
+                  child: widget.notFirstRun ? MyHomePage() : Onboarding()),
           debugShowCheckedModeBanner: false,
         );
       },

@@ -4,7 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../utils/MySharedPreferences.dart';
 import 'final_page_with_login.dart';
-import 'MyHomePage.dart';
+import 'home_page.dart';
 
 class Onboarding extends StatelessWidget {
   final PageController _controller = PageController();

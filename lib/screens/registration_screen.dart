@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'MyHomePage.dart';
+import 'home_page.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
