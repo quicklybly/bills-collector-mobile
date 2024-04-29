@@ -1,6 +1,5 @@
 import 'package:bills_collector_mobile/model/payment.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../model/bill.dart';
 

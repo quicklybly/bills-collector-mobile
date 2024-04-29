@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'model/bill.dart';
 import 'model/payment.dart';
 
-bool _isDemoUsingDynamicColors = false;
-
 const _brandBlue = Color(0xFF1E88E5);
 
 CustomColors lightCustomColors = const CustomColors(danger: Color(0xFFE53935));
@@ -49,7 +47,6 @@ class _MyAppState extends State<MyApp> {
           darkColorScheme = darkColorScheme.copyWith(secondary: _brandBlue);
           darkCustomColors = darkCustomColors.harmonized(darkColorScheme);
 
-          _isDemoUsingDynamicColors = true;
         } else {
           lightColorScheme = ColorScheme.fromSeed(
             seedColor: _brandBlue,

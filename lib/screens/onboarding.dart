@@ -1,10 +1,6 @@
-import 'package:bills_collector_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../utils/MySharedPreferences.dart';
 import 'final_page_with_login.dart';
-import 'home_page.dart';
 
 class Onboarding extends StatelessWidget {
   final PageController _controller = PageController();
