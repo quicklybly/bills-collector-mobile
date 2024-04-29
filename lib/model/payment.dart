@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'payment.g.dart';
 
 @JsonSerializable()
-class Payment {
+class Payment{
   Payment(this.id, this.usage, this.dateTime);
 
   int id;
