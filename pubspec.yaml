@@ -1,5 +1,5 @@
 name: bills_collector_mobile
-description: "A new Flutter project."
+description: "Bills Collector"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,6 +40,9 @@ dependencies:
   dynamic_color: ^1.7.0
   smooth_page_indicator: ^1.1.0
   json_annotation: ^4.8.1
+  fl_chart: ^0.67.0
+  intl: ^0.19.0
+  collection: any
 
 dev_dependencies:
   flutter_test:
