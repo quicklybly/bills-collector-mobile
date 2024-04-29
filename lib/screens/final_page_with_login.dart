@@ -1,8 +1,12 @@
 import 'package:bills_collector_mobile/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../model/bill.dart';
+import '../model/bills.dart';
+import '../model/payment.dart';
 import '../utils/MySharedPreferences.dart';
-import 'MyHomePage.dart';
+import 'home_page.dart';
 
 class FinalPage extends StatefulWidget {
   const FinalPage({super.key});
@@ -53,7 +57,19 @@ class _FinalPageState extends State<FinalPage> {
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()));
+                      MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+                          create: (context) => Bills([
+                            Bill(1, "Электричество", "comment", [
+                              Payment(1, 100, DateTime(2024, 1, 1)),
+                              Payment(2, 150, DateTime(2024, 2, 1)),
+                              Payment(5, 125, DateTime(2024, 3, 1)),
+                            ]),
+                            Bill(2, "Газ", "comment2", [
+                              Payment(3, 50, DateTime(2024, 3, 1)),
+                              Payment(4, 25, DateTime(2024, 4, 5))
+                            ])
+                          ]),
+                          child: MyHomePage())));
                 },
                 child: const Text(
                   "Продолжить без авторизации",
