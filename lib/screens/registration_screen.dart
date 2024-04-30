@@ -1,5 +1,10 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../model/bill.dart';
+import '../model/bills.dart';
+import '../model/payment.dart';
 import 'home_page.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -35,8 +40,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
+                  AppMetrica.reportEvent('To homepage without login');
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()));
+                      MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+                          create: (context) => Bills([
+                            Bill(1, "Электричество", "comment", [
+                              Payment(1, 100, DateTime(2024, 1, 1)),
+                              Payment(2, 150, DateTime(2024, 2, 1)),
+                              Payment(5, 125, DateTime(2024, 3, 1)),
+                            ]),
+                            Bill(2, "Газ", "comment2", [
+                              Payment(3, 50, DateTime(2024, 3, 1)),
+                              Payment(4, 25, DateTime(2024, 4, 5))
+                            ])
+                          ]),
+                          child: MyHomePage())));
                 },
                 child: const Text(
                   "Продолжить без авторизации",
