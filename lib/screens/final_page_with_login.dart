@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:bills_collector_mobile/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +57,7 @@ class _FinalPageState extends State<FinalPage> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
+                  AppMetrica.reportEvent('To homepage without login');
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
                           create: (context) => Bills([

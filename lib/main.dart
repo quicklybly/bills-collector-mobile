@@ -4,7 +4,9 @@ import 'package:bills_collector_mobile/screens/onboarding.dart';
 import 'package:bills_collector_mobile/utils/MySharedPreferences.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 import 'model/bill.dart';
 import 'model/payment.dart';
@@ -16,6 +18,9 @@ CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  String appmetrikaApiKey = dotenv.get('APPMETRIKA_API_KEY', fallback: '');
+  AppMetrica.activate(AppMetricaConfig(appmetrikaApiKey));
   final notFirstRun =
       await MySharedPreferences.instance.getBooleanValue("notFirstRun");
   runApp(MyApp(notFirstRun: notFirstRun));
@@ -46,7 +51,6 @@ class _MyAppState extends State<MyApp> {
           darkColorScheme = darkDynamic.harmonized();
           darkColorScheme = darkColorScheme.copyWith(secondary: _brandBlue);
           darkCustomColors = darkCustomColors.harmonized(darkColorScheme);
-
         } else {
           lightColorScheme = ColorScheme.fromSeed(
             seedColor: _brandBlue,
@@ -69,18 +73,18 @@ class _MyAppState extends State<MyApp> {
           ),
           themeMode: ThemeMode.system,
           home: ChangeNotifierProvider(
-                  create: (context) => Bills([
-                        Bill(1, "Электричество", "comment", [
-                          Payment(1, 100, DateTime(2024, 1, 1)),
-                          Payment(2, 150, DateTime(2024, 2, 1)),
-                          Payment(5, 125, DateTime(2024, 3, 1)),
-                        ]),
-                        Bill(2, "Газ", "comment2", [
-                          Payment(3, 50, DateTime(2024, 3, 1)),
-                          Payment(4, 25, DateTime(2024, 4, 5))
-                        ])
-                      ]),
-                  child: widget.notFirstRun ? MyHomePage() : Onboarding()),
+              create: (context) => Bills([
+                    Bill(1, "Электричество", "comment", [
+                      Payment(1, 100, DateTime(2024, 1, 1)),
+                      Payment(2, 150, DateTime(2024, 2, 1)),
+                      Payment(5, 125, DateTime(2024, 3, 1)),
+                    ]),
+                    Bill(2, "Газ", "comment2", [
+                      Payment(3, 50, DateTime(2024, 3, 1)),
+                      Payment(4, 25, DateTime(2024, 4, 5))
+                    ])
+                  ]),
+              child: widget.notFirstRun ? MyHomePage() : Onboarding()),
           debugShowCheckedModeBanner: false,
         );
       },
