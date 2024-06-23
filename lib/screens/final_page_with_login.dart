@@ -5,9 +5,10 @@ import 'package:provider/provider.dart';
 
 import '../model/bill.dart';
 import '../model/bills.dart';
-import '../model/payment.dart';
+import '../model/usages.dart';
 import '../utils/MySharedPreferences.dart';
 import 'home_page.dart';
+import 'login_screen.dart';
 
 class FinalPage extends StatefulWidget {
   const FinalPage({super.key});
@@ -45,7 +46,7 @@ class _FinalPageState extends State<FinalPage> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const RegistrationScreen()));
@@ -57,18 +58,18 @@ class _FinalPageState extends State<FinalPage> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
-                  AppMetrica.reportEvent('To homepage without login');
+                  AppMetrica.reportEvent('Продолжение без авторизации');
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
                           create: (context) => Bills([
                             Bill(1, "Электричество", "comment", [
-                              Payment(1, 100, DateTime(2024, 1, 1)),
-                              Payment(2, 150, DateTime(2024, 2, 1)),
-                              Payment(5, 125, DateTime(2024, 3, 1)),
+                              Usages(1, 100, DateTime(2024, 1, 1)),
+                              Usages(2, 150, DateTime(2024, 2, 1)),
+                              Usages(5, 125, DateTime(2024, 3, 1)),
                             ]),
                             Bill(2, "Газ", "comment2", [
-                              Payment(3, 50, DateTime(2024, 3, 1)),
-                              Payment(4, 25, DateTime(2024, 4, 5))
+                              Usages(3, 50, DateTime(2024, 3, 1)),
+                              Usages(4, 25, DateTime(2024, 4, 5))
                             ])
                           ]),
                           child: MyHomePage())));
@@ -85,71 +86,5 @@ class _FinalPageState extends State<FinalPage> {
   }
 }
 
-// todo вынести в отдельный класс все же
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
 
-  @override
-  State<StatefulWidget> createState() => _LoginFormState();
-}
-
-class _LoginFormState extends State<LoginForm> {
-  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Form(
-      key: _loginFormKey,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Логин',
-                  hintText: 'Введите логин',
-              ),
-              validator: (String? value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите что-нибудь';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Пароль',
-                hintText: 'Введите пароль',
-              ),
-              validator: (String? value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите что-нибудь';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12,),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_loginFormKey.currentState!.validate()) {
-                    // Process data.
-                  }
-                },
-                child: const Text('Войти',),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

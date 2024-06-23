@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../model/bill.dart';
 import '../model/bills.dart';
-import '../model/payment.dart';
+import '../model/usages.dart';
+import '../services/auth_service.dart';
 import 'home_page.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -40,18 +41,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
-                  AppMetrica.reportEvent('To homepage without login');
+                  AppMetrica.reportEvent('Продолжение без авторизации');
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
                           create: (context) => Bills([
                             Bill(1, "Электричество", "comment", [
-                              Payment(1, 100, DateTime(2024, 1, 1)),
-                              Payment(2, 150, DateTime(2024, 2, 1)),
-                              Payment(5, 125, DateTime(2024, 3, 1)),
+                              Usages(1, 100, DateTime(2024, 1, 1)),
+                              Usages(2, 150, DateTime(2024, 2, 1)),
+                              Usages(5, 125, DateTime(2024, 3, 1)),
                             ]),
                             Bill(2, "Газ", "comment2", [
-                              Payment(3, 50, DateTime(2024, 3, 1)),
-                              Payment(4, 25, DateTime(2024, 4, 5))
+                              Usages(3, 50, DateTime(2024, 3, 1)),
+                              Usages(4, 25, DateTime(2024, 4, 5))
                             ])
                           ]),
                           child: MyHomePage())));
@@ -77,6 +78,35 @@ class RegistrationForm extends StatefulWidget {
 
 class _RegistrationFormState extends State<RegistrationForm> {
   final GlobalKey<FormState> _registrationFormKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _register() async {
+    if (_registrationFormKey.currentState!.validate()) {
+      final success = await _authService.register(
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Регистрация успешна')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Регистрация не удалась')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +119,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
+              controller: _usernameController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Логин',
@@ -105,6 +136,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               height: 12,
             ),
             TextFormField(
+              controller: _passwordController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Пароль',
@@ -121,8 +153,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
+                  AppMetrica.reportEvent('Регистрация в приложении'); // todo
                   if (_registrationFormKey.currentState!.validate()) {
-                    // Process data.
+                    _register();
                   }
                 },
                 child: const Text('Зарегистрироваться',),
