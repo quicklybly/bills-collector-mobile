@@ -1,6 +1,9 @@
 import 'package:bills_collector_mobile/model/bill.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+import '../services/bills_service.dart';
+
 class EditBill extends StatefulWidget {
   const EditBill({super.key, required this.bill});
 
@@ -22,8 +25,8 @@ class _EditBillState extends State<EditBill> {
 
   @override
   Widget build(BuildContext context) {
-    typeController.text = widget.bill.type;
-    commentController.text = widget.bill.comment;
+    typeController.text = widget.bill.name;
+    commentController.text = widget.bill.description;
 
     return Scaffold(
       appBar: AppBar(
@@ -56,10 +59,38 @@ class _EditBillState extends State<EditBill> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          widget.bill.edit(typeController.text, commentController.text);
-          Navigator.of(context).popUntil((route) => route
-              .isFirst); // todo баг при isFirstRun == true
+        onPressed: () async {
+          try {
+            AuthService authService = AuthService();
+            String? token = await authService.getToken();
+
+            if (token != null) {
+              BillsService billsService = BillsService();
+              Bill updatedBill = await billsService.editBill(
+                widget.bill.id,
+                typeController.text,
+                commentController.text,
+                token,
+              );
+
+              setState(() {
+                widget.bill.name = updatedBill.name;
+                widget.bill.description = updatedBill.description;
+              });
+
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            } else {
+              // Handle the case where token is not available
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Не удалось получить токен')),
+              );
+            }
+          } catch (e) {
+            // Handle any errors that occur during the request
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Ошибка при редактировании счета: $e')),
+            );
+          }
         },
         child: const Icon(Icons.save),
       ),

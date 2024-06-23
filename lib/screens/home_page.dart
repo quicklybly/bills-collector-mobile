@@ -9,6 +9,10 @@ import 'package:bills_collector_mobile/utils/IconPicker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../model/usages.dart';
+import '../services/auth_service.dart';
+import '../services/bills_service.dart';
+
 class DrawerPoints {
   const DrawerPoints(this.label, this.icon, this.selectedIcon, this.screen);
 
@@ -153,15 +157,39 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (BuildContext context, int index) {
             final item = bills.bills[index];
             return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
+              onTap: () async {
+                try {
+                  AuthService authService = AuthService();
+                  String? token = await authService.getToken();
+
+                  if (token != null) {
+                    BillsService billsService = BillsService();
+                    List<Usages> usages = await billsService.fetchUsages(item.id, token);
+                    item.usages = usages;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
                         builder: (context) => DetailPage(
-                              bill: item,
-                              bills: bills,
-                            )));
+                          bill: item,
+                          bills: bills,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Handle the case where token is not available
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Не удалось получить токен')),
+                    );
+                  }
+                } catch (e) {
+                  // Handle any errors that occur during the request
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Ошибка при загрузке расходов: $e')),
+                  );
+                }
               },
+
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
@@ -177,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Icon(
-                            IconPicker().pick(item.type),
+                            IconPicker().pick(item.name),
                             color: theme.colorScheme.onPrimaryContainer,
                           ),
                         ),
@@ -186,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          item.type,
+                          item.name,
                           style: theme.textTheme.titleSmall!.copyWith(
                               color: theme.colorScheme.onPrimaryContainer),
                         ),
@@ -200,6 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: "Добавление услуги",
         onPressed: () {
           Navigator.push(
               context,

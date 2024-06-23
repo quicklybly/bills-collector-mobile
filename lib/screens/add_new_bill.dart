@@ -1,7 +1,10 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:bills_collector_mobile/model/bill.dart';
 import 'package:flutter/material.dart';
 
 import '../model/bills.dart';
+import '../services/auth_service.dart';
+import '../services/bills_service.dart';
 
 class AddNewBill extends StatefulWidget {
   const AddNewBill({super.key, required this.bills});
@@ -53,10 +56,36 @@ class _AddNewBillState extends State<AddNewBill> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          widget.bills.add(Bill(99, typeController.text,
-              '${commentController.text}', []));
-          Navigator.pop(context);
+        onPressed: () async {
+          AppMetrica.reportEvent('Создана услуга');
+
+          try {
+            AuthService authService = AuthService();
+            String? token = await authService.getToken();
+
+            if (token != null) {
+              BillsService billsService = BillsService();
+              Bill newBill = await billsService.createBill(
+                typeController.text,
+                commentController.text,
+                token,
+              );
+
+              setState(() {
+                widget.bills.add(newBill);
+              });
+
+              Navigator.pop(context);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Не удалось получить токен')),
+              );
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Ошибка при создании счета: $e')),
+            );
+          }
         },
         child: const Icon(Icons.save),
       ),

@@ -1,15 +1,19 @@
 import 'package:bills_collector_mobile/model/bills.dart';
+import 'package:bills_collector_mobile/screens/final_page_with_login.dart';
 import 'package:bills_collector_mobile/screens/home_page.dart';
 import 'package:bills_collector_mobile/screens/onboarding.dart';
+import 'package:bills_collector_mobile/services/auth_service.dart';
+import 'package:bills_collector_mobile/services/bills_service.dart';
 import 'package:bills_collector_mobile/utils/MySharedPreferences.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 import 'model/bill.dart';
-import 'model/payment.dart';
+import 'model/usages.dart';
 
 const _brandBlue = Color(0xFF1E88E5);
 
@@ -61,7 +65,26 @@ class _MyAppState extends State<MyApp> {
           );
         }
 
+        Future<List<Bill>> fetchInitialBills() async {
+          AuthService authService = AuthService();
+          String? token = await authService.getToken();
+          if (token != null) {
+            BillsService billsService = BillsService();
+            return await billsService.fetchBills();
+          } else {
+            return [];
+          }
+        }
+
         return MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ru'),
+          ],
           title: 'Bills Collector',
           theme: ThemeData(
             colorScheme: lightColorScheme,
@@ -72,19 +95,26 @@ class _MyAppState extends State<MyApp> {
             extensions: [darkCustomColors],
           ),
           themeMode: ThemeMode.system,
-          home: ChangeNotifierProvider(
-              create: (context) => Bills([
-                    Bill(1, "Электричество", "comment", [
-                      Payment(1, 100, DateTime(2024, 1, 1)),
-                      Payment(2, 150, DateTime(2024, 2, 1)),
-                      Payment(5, 125, DateTime(2024, 3, 1)),
-                    ]),
-                    Bill(2, "Газ", "comment2", [
-                      Payment(3, 50, DateTime(2024, 3, 1)),
-                      Payment(4, 25, DateTime(2024, 4, 5))
-                    ])
-                  ]),
-              child: widget.notFirstRun ? MyHomePage() : Onboarding()),
+          home: FutureBuilder<List<Bill>>(
+            future: fetchInitialBills(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return ChangeNotifierProvider(
+                  create: (context) => Bills(snapshot.data!),
+                  child: Onboarding(),
+                );
+              } else if (snapshot.hasData) {
+                return ChangeNotifierProvider(
+                  create: (context) => Bills(snapshot.data!),
+                  child: widget.notFirstRun ? MyHomePage() : Onboarding(),
+                );
+              } else {
+                return Center(child: Text('No data available'));
+              }
+            }
+          ),
           debugShowCheckedModeBanner: false,
         );
       },

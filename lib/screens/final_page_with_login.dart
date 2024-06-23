@@ -63,13 +63,13 @@ class _FinalPageState extends State<FinalPage> {
                       MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
                           create: (context) => Bills([
                             Bill(1, "Электричество", "comment", [
-                              Usages(1, 100, DateTime(2024, 1, 1)),
-                              Usages(2, 150, DateTime(2024, 2, 1)),
-                              Usages(5, 125, DateTime(2024, 3, 1)),
+                              Usages(1, 100, DateTime(2024, 1, 1), 1),
+                              Usages(2, 150, DateTime(2024, 2, 1), 1),
+                              Usages(5, 125, DateTime(2024, 3, 1), 1),
                             ]),
                             Bill(2, "Газ", "comment2", [
-                              Usages(3, 50, DateTime(2024, 3, 1)),
-                              Usages(4, 25, DateTime(2024, 4, 5))
+                              Usages(3, 50, DateTime(2024, 3, 1), 2),
+                              Usages(4, 25, DateTime(2024, 4, 5), 2)
                             ])
                           ]),
                           child: MyHomePage())));

@@ -1,7 +1,10 @@
-import 'package:bills_collector_mobile/model/payment.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
+import 'package:bills_collector_mobile/model/usages.dart';
 import 'package:flutter/material.dart';
 
 import '../model/bill.dart';
+import '../services/auth_service.dart';
+import '../services/bills_service.dart';
 
 class AddPayment extends StatefulWidget {
   const AddPayment({super.key, required this.bill});
@@ -77,14 +80,45 @@ class _AddPaymentState extends State<AddPayment> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          widget.bill.payments.add(Payment(
-              101,
-              double.parse(consumptionController.text.replaceAll(",", "")),
-              DateTime.parse(dateController.text)));
-          // Navigator.pop(context);
-          Navigator.of(context).popUntil(
-              (route) => route.isFirst); // todo баг при isFirstRun == true
+        onPressed: () async {
+          AppMetrica.reportEvent('Добавлен платеж');
+
+          try {
+            AuthService authService = AuthService();
+            String? token = await authService.getToken();
+
+            if (token != null) {
+              BillsService billsService = BillsService();
+              Usages newUsage = Usages(
+                0,
+                double.parse(consumptionController.text.replaceAll(",", "")),
+                DateTime.parse(dateController.text),
+                widget.bill.id,
+              );
+
+              Usages createdUsage = await billsService.createUsage(
+                widget.bill.id,
+                newUsage,
+                token,
+              );
+
+              setState(() {
+                widget.bill.usages.add(createdUsage);
+              });
+
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            } else {
+              // Handle the case where token is not available
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Не удалось получить токен')),
+              );
+            }
+          } catch (e) {
+            // Handle any errors that occur during the request
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Ошибка при создании расхода: $e')),
+            );
+          }
         },
         child: const Icon(Icons.save),
       ),
