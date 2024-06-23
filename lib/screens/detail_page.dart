@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:bills_collector_mobile/screens/add_payment.dart';
 import 'package:bills_collector_mobile/screens/edit_bill.dart';
 import 'package:collection/collection.dart';
@@ -7,7 +8,9 @@ import 'package:intl/intl.dart';
 
 import '../model/bill.dart';
 import '../model/bills.dart';
-import '../model/payment.dart';
+import '../model/usages.dart';
+import '../services/auth_service.dart';
+import '../services/bills_service.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key, required this.bill, required this.bills});
@@ -26,7 +29,7 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         scrolledUnderElevation: 4.0,
-        title: Text(widget.bill.type),
+        title: Text(widget.bill.name),
         actions: [
           IconButton(
               onPressed: () {
@@ -37,29 +40,51 @@ class _DetailPageState extends State<DetailPage> {
               },
               icon: Icon(Icons.edit)),
           IconButton(
-              onPressed: () => showDialog<String>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Удаление услуги'),
-                      content:
-                          const Text('Вы уверены, что хотите удалить услугу?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Отменить'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            widget.bills.remove(widget.bill);
-                            Navigator.of(context).popUntil((route) => route
-                                .isFirst); // todo баг при isFirstRun == true
-                          },
-                          child: const Text('Да'),
-                        ),
-                      ],
-                    ),
+            onPressed: () => showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Удаление услуги'),
+                content: const Text('Вы уверены, что хотите удалить услугу?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Отменить'),
                   ),
-              icon: Icon(Icons.delete))
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        AuthService authService = AuthService();
+                        String? token = await authService.getToken();
+
+                        if (token != null) {
+                          BillsService billsService = BillsService();
+                          await billsService.deleteBill(widget.bill.id, token);
+
+                          setState(() {
+                            widget.bills.remove(widget.bill);
+                          });
+
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        } else {
+                          // Handle the case where token is not available
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Не удалось получить токен')),
+                          );
+                        }
+                      } catch (e) {
+                        // Handle any errors that occur during the request
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Ошибка при удалении счета: $e')),
+                        );
+                      }
+                    },
+                    child: const Text('Да'),
+                  ),
+                ],
+              ),
+            ),
+            icon: Icon(Icons.delete),
+          )
         ],
       ),
       body: Padding(
@@ -73,7 +98,7 @@ class _DetailPageState extends State<DetailPage> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            widget.bill.payments.length < 3
+            widget.bill.usages.length < 3
                 ? Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Text(
@@ -81,30 +106,51 @@ class _DetailPageState extends State<DetailPage> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   )
-                : PaymentsChart(payments: widget.bill.payments),
+                : PaymentsChart(payments: widget.bill.usages),
             GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Советы по потреблению'),
-                    content: const Text(
-                        'Серверная фича, будет добавлено после реализации на беке.'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Ок :('),
+              onTap: () async {
+                try {
+                  AuthService authService = AuthService();
+                  String? token = await authService.getToken();
+
+                  if (token != null) {
+                    BillsService billsService = BillsService();
+                    String advice = await billsService.fetchAdvise(widget.bill.id, token);
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text('Советы по потреблению'),
+                        content: Text(advice),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              AppMetrica.reportEvent('Получена аналитика');
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Ок'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
+                    );
+                  } else {
+                    // Handle the case where token is not available
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Не удалось получить токен')),
+                    );
+                  }
+                } catch (e) {
+                  // Handle any errors that occur during the request
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Ошибка при получении рекомендации: $e')),
+                  );
+                }
               },
               child: Card(
                 color: Theme.of(context).colorScheme.secondaryContainer,
                 child: const ListTile(
                   title: Text('Рекомендации по потреблению'),
-                  subtitle: Text(
-                      'Серверная фича, будет добавлено после реализации на беке.'),
+                  subtitle: Text('(Нажми на меня)'),
                 ),
               ),
             ),
@@ -119,13 +165,13 @@ class _DetailPageState extends State<DetailPage> {
             ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                itemCount: widget.bill.payments.length,
+                itemCount: widget.bill.usages.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     title:
-                        Text(('Расход: ${widget.bill.payments[index].usage}')),
+                        Text(('Расход: ${widget.bill.usages[index].usage}')),
                     subtitle: Text(
-                        'Дата учета: ${DateFormat.yMd().format(widget.bill.payments[index].dateTime)}'),
+                        'Дата учета: ${DateFormat.yMd().format(widget.bill.usages[index].countDate)}'),
                   );
                 })
           ],
@@ -147,7 +193,7 @@ class _DetailPageState extends State<DetailPage> {
 class PaymentsChart extends StatefulWidget {
   const PaymentsChart({super.key, required this.payments});
 
-  final List<Payment> payments;
+  final List<Usages> payments;
 
   @override
   State<PaymentsChart> createState() => _PaymentsChartState();
@@ -180,7 +226,7 @@ class _PaymentsChartState extends State<PaymentsChart> {
     return SideTitleWidget(
       axisSide: meta.axisSide,
       child: Text(
-          DateFormat.MMM().format(widget.payments[value.toInt()].dateTime)),
+          DateFormat.MMM().format(widget.payments[value.toInt()].countDate)),
     );
   }
 
@@ -190,7 +236,7 @@ class _PaymentsChartState extends State<PaymentsChart> {
         show: true,
         drawVerticalLine: false,
         horizontalInterval: ([
-                  ...widget.payments.map((Payment payment) {
+                  ...widget.payments.map((Usages payment) {
                     return payment.usage;
                   })
                 ].average /
@@ -210,7 +256,7 @@ class _PaymentsChartState extends State<PaymentsChart> {
           sideTitles: SideTitles(
             showTitles: true,
             interval: ([
-                      ...widget.payments.map((Payment payment) {
+                      ...widget.payments.map((Usages payment) {
                         return payment.usage;
                       })
                     ].average /
@@ -244,13 +290,13 @@ class _PaymentsChartState extends State<PaymentsChart> {
       // minX: 0,
       // maxX: 11,
       minY: [
-            ...widget.payments.map((Payment payment) {
+            ...widget.payments.map((Usages payment) {
               return payment.usage;
             })
           ].min *
           0.9,
       maxY: [
-            ...widget.payments.map((Payment payment) {
+            ...widget.payments.map((Usages payment) {
               return payment.usage;
             })
           ].max *

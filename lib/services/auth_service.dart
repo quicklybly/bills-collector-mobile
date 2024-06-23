@@ -1,9 +1,15 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as logDev;
+
+
+
+import '../model/bills.dart';
 
 class AuthService {
-  final String _keycloakUrl = 'http://${dotenv.get('hostname', fallback: '')}:8081';
+  final String _keycloakUrl = 'http://${dotenv.get('hostname', fallback: '')}/auth';
   final String _realm = 'bills-collector';
   final String _clientId = dotenv.get('keycloak_user', fallback: '');
   final String _clientSecret = dotenv.get('keycloak_pass', fallback: '');
@@ -34,9 +40,23 @@ class AuthService {
     if (response.statusCode == 201) {
       return true;
     } else {
-      print('Failed to register user: ${response.body}');
       return false;
     }
+  }
+
+  Future<void> _saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('access_token', token);
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('access_token');
   }
 
   Future<Map<String, dynamic>?> login(String username, String password) async {
@@ -55,13 +75,13 @@ class AuthService {
       },
     );
 
-    print(username);
-    print(password);
 
+    logDev.log(response.body);
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final data = jsonDecode(response.body);
+      await _saveToken(data['access_token']);
+      return data;
     } else {
-      print('Failed to login: ${response.body}');
       return null;
     }
   }
@@ -79,7 +99,6 @@ class AuthService {
         'client_secret': _clientSecret,
       },
     );
-    print(response.body);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);

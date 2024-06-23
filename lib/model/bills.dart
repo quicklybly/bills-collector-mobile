@@ -10,8 +10,11 @@ class Bills extends ChangeNotifier {
 
   List<Bill> bills;
 
-  factory Bills.fromJson(Map<String, dynamic> json) => _$BillsFromJson(json);
-
+  factory Bills.fromJson(List<dynamic> parsedJson) {
+    return Bills(
+      parsedJson.map((i) => Bill.fromJson(i)).toList(),
+    );
+  }
   Map<String, dynamic> toJson() => _$BillsToJson(this);
 
   void add(Bill bill) {

@@ -42,20 +42,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               TextButton(
                 onPressed: () {
                   AppMetrica.reportEvent('Продолжение без авторизации');
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
-                          create: (context) => Bills([
-                            Bill(1, "Электричество", "comment", [
-                              Usages(1, 100, DateTime(2024, 1, 1)),
-                              Usages(2, 150, DateTime(2024, 2, 1)),
-                              Usages(5, 125, DateTime(2024, 3, 1)),
-                            ]),
-                            Bill(2, "Газ", "comment2", [
-                              Usages(3, 50, DateTime(2024, 3, 1)),
-                              Usages(4, 25, DateTime(2024, 4, 5))
-                            ])
-                          ]),
-                          child: MyHomePage())));
+                  Navigator.pop(context);
                 },
                 child: const Text(
                   "Продолжить без авторизации",
